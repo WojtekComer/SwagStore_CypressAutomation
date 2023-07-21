@@ -1,0 +1,18 @@
+[
+    {
+        "menuItem":"All Items",
+        "action":"/inventory.html"
+    },
+    {
+        "menuItem":"About",
+        "action":"https://saucelabs.com"
+    },
+    {
+        "menuItem":"Logout",
+        "action":"172.16.2.153:8080/SwagLabs"
+    },
+    {
+        "menuItem":"Reset App State",
+        "action":"/inventory.html"
+    }
+]

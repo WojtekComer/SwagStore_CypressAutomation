@@ -1,0 +1,61 @@
+[
+    
+    {
+        "opisTestu": "Login with locked_out_user",
+        "user": "locked_out_user",
+        "pass": "secret_sauce",
+        "itemcheck": "[data-test=\"error\"]",
+        "expectedResult": "Epic sadface: Sorry, this user has been locked out."
+    },
+    {
+        "opisTestu": "Login with Problem_user",
+        "user": "problem_user",
+        "pass": "secret_sauce",
+        "itemcheck": "[src=\"./static/media/sl-404.168b1cce10384b857a6f.jpg\"]",
+        "expectedResult": "sl-404.168b1cce10384b857a6f.jpg"
+    },
+    {
+        "opisTestu": "Login with performance_glitch_user",
+        "user": "performance_glitch_user",
+        "pass": "secret_sauce",
+        "itemcheck": ".inventory_item",
+        "expectedResult": 6
+    },
+    {
+        "opisTestu": "Login with wrong Username",
+        "user": "bla_bla",
+        "pass": "secret_sauce",
+        "itemcheck": "[data-test=\"error\"]",
+        "expectedResult": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "opisTestu": "Login with empty user_name field",
+        "user": "{SelectAll}{backspace}",
+        "pass": "secret_sauce",
+        "itemcheck": "[data-test=\"error\"]",
+        "expectedResult": "Epic sadface: Username is required"
+    },
+    {
+        "opisTestu": "Login with wrong password field",
+        "user": "Standard_user",
+        "pass": "bla_bla",
+        "itemcheck": "[data-test=\"error\"]",
+        "expectedResult": "Epic sadface: Username and password do not match any user in this service"
+        
+    },
+    {
+        "opisTestu": "Login with empty password field",
+        "user": "Standard_user",
+        "pass": "{SelectAll}{backspace}",
+        "itemcheck": "[data-test=\"error\"]",
+        "expectedResult": "Epic sadface: Password is required"
+        
+    },
+    {
+        "opisTestu": "Login with standard_user",
+        "user": "standard_user",
+        "pass": "secret_sauce",
+        "itemcheck": ".inventory_item" ,
+        "expectedResult": 6
+    }
+]

@@ -1,0 +1,22 @@
+[
+    {
+        "option":"Name (Z to A)",
+        "sortType": "za" ,
+        "result":"be.descending"
+    },
+    {
+        "option":"Name (A to Z)",
+        "sortType": "az",
+        "result":"be.ascending"
+    },
+    {
+        "option":"Price (low to high)",
+        "sortType": "lohi",
+        "result":"be.ascending"
+    },
+    {
+        "option":"Price (high to low)",
+        "sortType": "hilo",
+        "result":"be.descending"
+    }
+]

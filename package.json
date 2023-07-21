@@ -1,0 +1,20 @@
+{
+  "name": "cypressprojekt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cypress": "^12.16.0"
+  },
+  "devDependencies": {
+    "chai-sorted": "^0.2.0",
+    "cypress-each": "^1.13.3",
+    "cypress-map": "^1.21.0"
+  }
+}
