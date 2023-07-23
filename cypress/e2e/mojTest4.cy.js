@@ -87,13 +87,14 @@ describe('\n2. INVENTORY (PRODUCTS) PAGE TEST\n', () => {
             if (menu.menuItem == 'Reset App State') {  //sprawdzenie dzialania opcji 'Reset App state'
 
                 cy.dodajKazdyDoKoszyka()
+                cy.czyAddToCartButtonReset('Remove', 6)
                 cy.get('.bm-item-list').contains('Reset App State').click() //resetuje Apke
-                //cy.reload() //dla testu funkcji czyAddToCartButtonReset() bo jest defekt i nie odswieza strony po 'Reset App State'
-                cy.czyAddToCartButtonReset()
-
-                cy.get('#react-burger-menu-btn').should('be.visible').click() //burger menu button widoczny
+                //cy.checkPageReload('Reset App State') //to by bylo zamiast powyzszej instukcji ale wiem, ze nie odswieza
+                //cy.get('#react-burger-menu-btn').should('be.visible').click() //burger menu button widoczny
                 cy.get('.bm-cross-button').should('be.visible').click()
                 cy.get('.bm-item-list').should('not.be.visible')  //sprawdzenie czy dziala button 'X' zamykajacy menu
+                //cy.reload() //dla testu funkcji czyAddToCartButtonReset() bo jest defekt i nie odswieza strony po 'Reset App State'
+                cy.czyAddToCartButtonReset('Add to cart', 0)
 
             }
             else {
@@ -245,8 +246,78 @@ describe('\n3. \'YOUR CART\' PAGE TEST\n', () => {
         })
 
         cy.get('#continue-shopping').should('be.visible').click()  //powrot do inventory
-        cy.czyAddToCartButtonReset()
+        cy.czyAddToCartButtonReset('Add to cart', 0) //czy 'usun z koszyka' (linia 238 ) ma efekt na buttony w '/inventory.html'
 
     })
+
+})
+
+describe('\n3.1 \'YOUR CART\' PAGE - BURGER MENU TEST\n', { testIsolation: false } , () => {
+
+    it('\n---\'YOUR CART\' TEST - BURGER MENU---\nNumber of tests: 4\n', () => {
+        cy.mojLoginSwagStore(loginy.username, loginy.password)
+    })
+
+    it.each(burgerMenuItems)((z, l, t) => mojaKlasaTest4.testDescription(z, l, t, 'testyBurgerMenu'), (menu) => {
+
+        if(menu.menuItem == 'Reset App State') { // po poprzednim kroku 'Logout'
+            cy.mojLoginSwagStore(loginy.username, loginy.password) //loguj
+            cy.czyAddToCartButtonReset('Remove', 6) //czy pamieta stan koszyka i buttonow po poprzednim kroku 'Logout'
+        }
+
+        if(menu.menuItem == 'Logout') {cy.visit('/inventory.html') } //tylko opja 'Logout' tego wymaga
+
+        cy.get('.shopping_cart_link').should('be.visible').click() //przejdz do koszyka
+        cy.url().should('contain', '/cart.html')
+        cy.get('#react-burger-menu-btn').should('be.visible').click() //burger menu button widoczny
+        cy.get('.bm-item-list').should('be.visible') //menu musi byc widoczne (lub .bm-menu-wrap, aria-hidden = 'true' or 'false')
+        cy.get('.bm-item-list').contains(menu.menuItem).should('have.text', menu.menuItem) //czy zgodne z opisem
+
+        if (menu.menuItem != 'About') {   //z wyjatkiem 'About' bo 'https://saucelabs.com/' sie dlugo laduje i wywala test
+
+            if (menu.menuItem == 'Reset App State') {  //sprawdzenie dzialania opcji 'Reset App state'
+
+                //czy pamieta stan koszyka - '/cart.html' po ponownym zalogowaniu (poprzedni krok 'Logout')
+                cy.get('.shopping_cart_link').should('not.be.empty').children().should('have.text', 6) 
+                cy.get('.cart_list').children().should('have.length', 8)
+                cy.fixture('artukulyTest4').then((produkty) => {
+                    produkty.forEach((produkt) => {
+                        cy.sprawdzOpisProduktuCart(produkt)
+                    })
+            
+                })
+
+                cy.get('.bm-item-list').contains('Reset App State').click() //resetuje Apke
+                //cy.checkPageReload('Reset App State') // tak zamiast powyzszej ale wiem ze nie odswieza
+                //cy.get('#react-burger-menu-btn').should('be.visible').click() //burger menu button widoczny
+                cy.get('.bm-cross-button').should('be.visible').click()
+                cy.get('.bm-item-list').should('not.be.visible')  //sprawdzenie czy dziala button 'X' zamykajacy menu
+
+                cy.get('.shopping_cart_link').should('be.empty')
+                //cy.reload() //dla testu czy usuwa produkty z koszyka bo jest defekt i nie odswieza strony po 'Reset App State'
+                cy.get('.cart_list').children().should('have.length', 2) //czu suswa produkty z koszyka
+
+                cy.get('#continue-shopping').should('be.visible').click()  //powrot do inventory
+                cy.czyAddToCartButtonReset('Add to cart', 0)
+
+            }
+            else {
+                cy.get('.bm-item-list').contains(menu.menuItem).click() //klika w aktualna opcje zeby sprawdzic przekierowanie 
+                cy.url().should('contain', menu.action)  //czy dziala przekierowanie ?
+                if (menu.menuItem == 'All Items') { 
+                    cy.dodajKazdyDoKoszyka() //w pierwszym kroku dodaj wszystkie produkty do koszyka
+                    cy.czyAddToCartButtonReset('Remove', 6) //czy pamieta stan koszyka i buttonow 
+                }  
+            }
+        }
+        else { //jesli opcja: 'About'
+            cy.get('.shopping_cart_link').should('not.be.empty').children().should('have.text', 6) //spawdza stan koszyka na '/cart.html'
+            cy.get('.cart_list').children().should('have.length', 8)
+            cy.get('.bm-item-list').contains(menu.menuItem).should('have.attr', 'href') //sprawdza link dla opcji 'About'
+            cy.get('.bm-item-list').contains(menu.menuItem).invoke('attr', 'href').should('contain', 'https://saucelabs.com/')
+        }
+
+    })
+
 
 })
