@@ -98,28 +98,28 @@ Cypress.Commands.add('usunJedenZKoszyka', (skadUsunac, ktoryProdukt, sprawdzIlos
 
 })
 
-Cypress.Commands.add('czyAddToCartButtonReset', () => { //sprawdza stan na '/inventory.html' po 'Reset App State' 
+Cypress.Commands.add('czyAddToCartButtonReset', (stanButtona, stanKoszyka) => { //sprawdza stan na '/inventory.html' po 'Reset App State' 
 
     cy.url().should('contain', '/inventory.html') //czy jest na '/inventory.html'
-    cy.get('.shopping_cart_link').should('be.empty') //czy koszyk jest pusty na starcie
+    if(stanKoszyka == 0){ cy.get('.shopping_cart_link').should('be.empty') }  //czy koszyk jest pusty na starcie
+    else{ cy.get('.shopping_cart_link').should('not.be.empty').children().should('have.text', stanKoszyka) }
+     
     cy.fixture('artukulyTest4').then((produkty) => {  //bierze dane z json'a z opisem artukulow/produktow 
 
         produkty.forEach((produkt) => {  //sprawdza kolejno produkty czy maja zresetowany button 'Add to cart'
 
             cy.get('.inventory_list').contains(produkt.artykul).parent().siblings().children().eq(1).map('innerText')
                 .then(opisButtona => {
-                    if (opisButtona != 'ADD TO CART') {  //jesli nie zresetowany tylko dalej w stanie 'Remove'
+                    if (opisButtona != stanButtona.toUpperCase()) {  //jesli button w innym stanie niz podany w 'stanButtona'
 
                         cy.log(`----- ERROR!!! ----  
                          Button \'Add to cart\' for below product: 
-                         '${produkt.artykul}'
-                         failed to reset afer choosing option: 
-                        \'Reset App State\' from burger menu.`)
+                         '${produkt.artykul}' failed to reset`)
 
                     }
                 })
             cy.get('.inventory_list').contains(produkt.artykul).parent().siblings().children().eq(1)
-                .should('contain', 'Add to cart') //...buton przy kazdym produkcie ma byc zresetowany do stanu 'Add to cart'
+                .should('contain', stanButtona) //...buton przy kazdym produkcie ma byc zresetowany do stanu 'Add to cart'
 
         })
 
