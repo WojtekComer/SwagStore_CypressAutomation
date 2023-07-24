@@ -78,7 +78,7 @@ Cypress.Commands.add('dodajKazdyDoKoszyka', () => {
         produkty.forEach((produkt) => {
             cy.get('.inventory_list').contains(produkt.artykul).parent().siblings().children().eq(1)
                 .should('contain', 'Add to cart').click() //dodaj do koszyka
-                licznik = licznik + 1
+            licznik = licznik + 1
             cy.get('.shopping_cart_link').should('not.be.empty').children().should('have.text', licznik) // ile w koszyku
         })
 
@@ -101,9 +101,9 @@ Cypress.Commands.add('usunJedenZKoszyka', (skadUsunac, ktoryProdukt, sprawdzIlos
 Cypress.Commands.add('czyAddToCartButtonReset', (stanButtona, stanKoszyka) => { //sprawdza stan na '/inventory.html' po 'Reset App State' 
 
     cy.url().should('contain', '/inventory.html') //czy jest na '/inventory.html'
-    if(stanKoszyka == 0){ cy.get('.shopping_cart_link').should('be.empty') }  //czy koszyk jest pusty na starcie
-    else{ cy.get('.shopping_cart_link').should('not.be.empty').children().should('have.text', stanKoszyka) }
-     
+    if (stanKoszyka == 0) { cy.get('.shopping_cart_link').should('be.empty') }  //czy koszyk jest pusty na starcie
+    else { cy.get('.shopping_cart_link').should('not.be.empty').children().should('have.text', stanKoszyka) }
+
     cy.fixture('artukulyTest4').then((produkty) => {  //bierze dane z json'a z opisem artukulow/produktow 
 
         produkty.forEach((produkt) => {  //sprawdza kolejno produkty czy maja zresetowany button 'Add to cart'
@@ -150,4 +150,36 @@ Cypress.Commands.add('sprawdzOpisProduktuCart', (produkt) => {   //testowanie op
     cy.get('.cart_list').contains('div', produkt.artykul).parent().siblings().eq(0).should('contain', produkt.opisArtykulu)
     cy.get('.cart_list').contains('div', produkt.artykul).parent().siblings().eq(1).children()
         .eq(0).should('contain', produkt.cena)
+})
+
+Cypress.Commands.add('sprawdzLink', (jakieMedia, link) => {
+
+    cy.get('.footer').find(jakieMedia).should('be.visible').children().should('have.attr', 'href')
+    cy.get('.footer').find(jakieMedia).children().invoke('attr', 'href').should('contain', link)
+
+})
+
+Cypress.Commands.add('sprawdzFooter', () => {
+
+    cy.get('.footer').find('.footer_robot').should('be.visible')
+    cy.get('.footer').find('.footer_copy').should('contain', ' Sauce Labs. All Rights Reserved. Terms of Service | Privacy Policy')
+    //sprawdz linki
+    cy.sprawdzLink('.social_twitter', 'https://twitter.com/saucelabs')
+    cy.sprawdzLink('.social_facebook', 'https://www.facebook.com/saucelabs')
+    cy.sprawdzLink('.social_linkedin', 'https://www.linkedin.com/company/sauce-labs/')
+
+})
+
+Cypress.Commands.add('sprawdzHeader', (tytul) => {
+
+    cy.get('.app_logo').should('be.visible')
+    cy.get('.header_secondary_container').find('.title').should('be.visible').should('have.text', tytul)
+
+})
+
+Cypress.Commands.add('sprawdzPlaceholder', (gdzie, pole, opis) => {
+
+    cy.get(gdzie).find(pole).should('have.attr', 'placeholder')
+    cy.get(gdzie).find(pole).invoke('attr', 'placeholder').should('contain', opis) //sprawdzenie placeholdera 'Username'
+
 })
