@@ -1,0 +1,28 @@
+[
+    {
+        "name": "{SelectAll}{backspace}",
+        "surname": "Kowalski",
+        "postalCode": "111-222",
+        "itemcheck": "[data-test=\"error\"]",
+        "result": "Error: First Name is required"
+    },
+    {
+        "name": "Jan",
+        "surname": "{SelectAll}{backspace}",
+        "postalCode": "111-222",
+        "itemcheck": "[data-test=\"error\"]",
+        "result": "Error: Last Name is required"
+    },
+    {
+        "name": "Jan",
+        "surname": "Kowalski",
+        "postalCode": "{SelectAll}{backspace}",
+        "itemcheck": "[data-test=\"error\"]",
+        "result": "Error: Postal Code is required"
+    },
+    {
+        "name": "Jan",
+        "surname": "Kowalski",
+        "postalCode": "111-222"
+    }
+]
