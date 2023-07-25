@@ -3,6 +3,7 @@ import daneLogowania from '../fixtures/loginyTest4.json'
 import artykuly from '../fixtures/artukulyTest4.json'
 import burgerMenuItems from '../fixtures/burgerMenuTest4.json'
 import selectOptions from '../fixtures/sortMenuTest4.json'
+import checkoutForm from '../fixtures/checkoutFormTest4.json'
 import { mojaKlasaTest4 } from './mojaKlasaTest4'
 
 let loginy = Cypress.env('swagTesting')
@@ -18,11 +19,11 @@ describe('\n1. LOGIN PAGE TEST\n', () => {
         cy.location('href').should('contain', '172.16.2.153:8080')  //sprawdzenie location
         cy.get('.login_logo').should('be.visible') //logo
         cy.get('.bot_column').should('be.visible') //bot logo
-        cy.get('#user-name').should('have.attr', 'placeholder')
-        cy.get('#user-name').invoke('attr', 'placeholder').should('contain', 'Username') //sprawdzenie placeholdera 'Username'
-        cy.get('#password').should('have.attr', 'placeholder')
-        cy.get('#password').invoke('attr', 'placeholder').should('contain', 'Password')  //sprawdzenie placeholdera 'Password'
-        cy.get('.form_group').siblings().eq(2).should('exist')   //sprawdzenie istnienia 'error-message-container error'
+
+        cy.sprawdzPlaceholder('.login-box', '#user-name', 'Username') //sprawdzenie placeholdera 'Username'
+        cy.sprawdzPlaceholder('.login-box', '#password', 'Password') //sprawdzenie placeholdera 'Password'  
+        cy.get('.form_group').siblings().eq(2).should('exist') //sprawdzenie istnienia 'error-message-container error'
+        cy.get('.login-box').find('#login-button').should('be.visible').should('have.value','Login') //login button 
 
     })
 
@@ -139,20 +140,10 @@ describe('\n2. INVENTORY (PRODUCTS) PAGE TEST\n', () => {
         cy.zrobSesje(loginy.username, loginy.password)
         cy.visit('/inventory.html')
 
-        cy.get('.app_logo').should('be.visible')
-        cy.get('.header_secondary_container').find('.title').should('be.visible').should('have.text', 'Products')
-            .siblings().eq(0).should('be.visible')
-        cy.get('.footer').find('.footer_robot').should('be.visible')
-        cy.get('.footer').find('.footer_copy').should('contain', ' Sauce Labs. All Rights Reserved. Terms of Service | Privacy Policy')
-        //sprawdz linki
-        cy.get('.footer').find('.social_twitter').should('be.visible').children().should('have.attr', 'href')
-        cy.get('.footer').find('.social_twitter').children().invoke('attr', 'href').should('contain', 'https://twitter.com/saucelabs')
+        cy.sprawdzHeader('Products')
+        cy.get('.header_secondary_container').find('.title').siblings().eq(0).should('be.visible') //sprawdz logo robot w header
 
-        cy.get('.footer').find('.social_facebook').should('be.visible').children().should('have.attr', 'href')
-        cy.get('.footer').find('.social_facebook').children().invoke('attr', 'href').should('contain', 'https://www.facebook.com/saucelabs')
-
-        cy.get('.footer').find('.social_linkedin').should('be.visible').children().should('have.attr', 'href')
-        cy.get('.footer').find('.social_linkedin').children().invoke('attr', 'href').should('contain', 'https://www.linkedin.com/company/sauce-labs/')
+        cy.sprawdzFooter()
 
     })
 
@@ -166,13 +157,14 @@ describe('\n3. \'YOUR CART\' PAGE TEST\n', () => {
 
         cy.zrobSesje(loginy.username, loginy.password)
         cy.visit('/inventory.html')
+
         cy.url().should('contain', '/inventory.html')
         cy.get('.shopping_cart_link').should('be.empty').click() // czy koszyk jest pusty na starcie ?
 
         cy.url().should('contain', '/cart.html')
         cy.get('.shopping_cart_link').should('be.empty')
-        cy.get('.app_logo').should('be.visible')
-        cy.get('.title').should('contain', 'Your Cart')
+        cy.sprawdzHeader('Your Cart')
+        cy.sprawdzFooter()
         cy.get('.cart_quantity_label').should('have.text', 'QTY')
         cy.get('.cart_desc_label').should('have.text', 'DESCRIPTION')
 
@@ -319,5 +311,67 @@ describe('\n3.1 \'YOUR CART\' PAGE - BURGER MENU TEST\n', { testIsolation: false
 
     })
 
+
+})
+
+describe('\n4. \'CHECKOUT: YOUR INFORMATION\' PAGE TEST\n', () => {
+
+    it('\n---\'CHECKOUT: YOUR INFORMATION\' PAGE APPEARANCE TEST---\nNumber of tests: 1\n', () => { })
+
+    it(`Test 1/1 - \'CHECKOUT: YOUR INFORMATION\' appearance test.\n${mojaKlasaTest4.czasTestu()}`, () => {
+
+        cy.zrobSesje(loginy.username, loginy.password)
+        cy.visit('/inventory.html')
+
+        cy.get('.shopping_cart_link').should('be.visible').click() //przejdz do koszyka
+        cy.url().should('contain', '/cart.html')
+        cy.get('#checkout').should('be.visible').click() //przejdz do checkout-step-one.html 
+
+        cy.url().should('contain','/checkout-step-one.html')
+        cy.get('.shopping_cart_link').should('be.empty')
+        cy.sprawdzHeader('Checkout: Your Information')
+        cy.sprawdzFooter()
+        
+        cy.sprawdzPlaceholder('.checkout_info', '#first-name', 'First Name')
+        cy.sprawdzPlaceholder('.checkout_info', '#last-name', 'Last Name')
+        cy.sprawdzPlaceholder('.checkout_info', '#postal-code', 'Zip/Postal Code')
+        cy.get('.checkout_info').children().eq(3).should('exist')    // '.error-message-container'
+        cy.get('.error-message-container').should('be.empty') // '.error-message-container'
+        cy.get('#continue').should("be.visible")
+        cy.get('#cancel').should("be.visible").click()
+        cy.url().should('contain','/cart.html')
+
+    })
+
+    it('\n---\'CHECKOUT: YOUR INFORMATION\' FORM TEST---\nNumber of tests: 4\n', () => { })
+
+    it.each(checkoutForm)((z, l, t) => mojaKlasaTest4.testDescription(z, l, t, 'checkoutFormTest'), (formularz) => {  //testy logowania z roznymi opcjami
+
+        cy.zrobSesje(loginy.username, loginy.password)
+        cy.visit('/inventory.html')
+
+        cy.get('.shopping_cart_link').should('be.visible').click() //przejdz do koszyka
+        cy.url().should('contain', '/cart.html')
+        cy.get('#checkout').should('be.visible').click() //przejdz do checkout-step-one.html 
+        cy.url().should('contain','/checkout-step-one.html')
+        //cy.get('.shopping_cart_link').should('be.empty')
+
+        cy.get('.checkout_info').find('#first-name').type(formularz.name)
+        cy.get('.checkout_info').find('#last-name').type(formularz.surname)
+        cy.get('.checkout_info').find('#postal-code').type(formularz.postalCode)
+        cy.get('#continue').should("be.visible").click()
+
+        if (formularz.itemcheck == "[data-test=\"error\"]") {   //w przypadku podania niepoprawnych danych
+            cy.get('.error-message-container').should('not.be.empty')  //'error-message-container' dostaje zawartosc obsugujaca blad
+            cy.get(formularz.itemcheck).should('contain', formularz.result)
+            cy.get(formularz.itemcheck).children().click()  //po zamknieciu 'error-message-container'
+            cy.get('.error-message-container').should('be.empty')  //po zamknieciu 'error-message-container' powinien byc pusty
+            //cy.get(login.itemcheck).contains(login.expectedResult).should('be.visible') // wiec to juz nie bedzie widoczne 
+        }
+        else{
+            cy.url().should('contain','/checkout-step-two.html')
+        }
+
+    })
 
 })
