@@ -191,7 +191,7 @@ describe('\n3. \'YOUR CART\' PAGE TEST\n', () => {
         cy.get('.shopping_cart_link').should('not.be.empty').children().should('have.text', 1)
         cy.get('.cart_list').children().should('have.length', 3) // -> (2 zawsze) + 1 = jest 1 produkt '.cart_item' w koszyku
 
-        cy.sprawdzOpisProduktuCart(danyArtykul) //testowanie opisow ilosci i cen w koszyku
+        cy.sprawdzOpisProduktuCart(danyArtykul) //testowanie opisow, ilosci i cen w koszyku
 
         cy.get('.cart_list').contains('div', danyArtykul.artykul).parent().siblings().eq(1).children()
             .eq(1).should('contain', 'Remove').click() //usun z koszyka
@@ -287,7 +287,7 @@ describe('\n3.1 \'YOUR CART\' PAGE - BURGER MENU TEST\n', { testIsolation: false
 
                 cy.get('.shopping_cart_link').should('be.empty')
                 //cy.reload() //dla testu czy usuwa produkty z koszyka bo jest defekt i nie odswieza strony po 'Reset App State'
-                cy.get('.cart_list').children().should('have.length', 2) //czu suswa produkty z koszyka
+                cy.get('.cart_list').children().should('have.length', 2) //czy usunal produkty z koszyka
 
                 cy.get('#continue-shopping').should('be.visible').click()  //powrot do inventory
                 cy.czyAddToCartButtonReset('Add to cart', 0)
@@ -298,7 +298,6 @@ describe('\n3.1 \'YOUR CART\' PAGE - BURGER MENU TEST\n', { testIsolation: false
                 cy.url().should('contain', menu.action)  //czy dziala przekierowanie ?
                 if (menu.menuItem == 'All Items') { 
                     cy.dodajKazdyDoKoszyka() //w pierwszym kroku dodaj wszystkie produkty do koszyka
-                    cy.czyAddToCartButtonReset('Remove', 6) //czy pamieta stan koszyka i buttonow 
                 }  
             }
         }
@@ -373,5 +372,70 @@ describe('\n4. \'CHECKOUT: YOUR INFORMATION\' PAGE TEST\n', () => {
         }
 
     })
+
+})
+
+describe('\n4.1 \'CHECKOUT: YOUR INFORMATION\' PAGE - BURGER MENU TEST\n', { testIsolation: false } , () => {
+
+    it('\n---\'CHECKOUT: YOUR INFORMATION\' TEST - BURGER MENU---\nNumber of tests: 4\n', () => {
+        cy.mojLoginSwagStore(loginy.username, loginy.password)
+    })
+
+    it.each(burgerMenuItems)((z, l, t) => mojaKlasaTest4.testDescription(z, l, t, 'testyBurgerMenu'), (menu) => {
+
+        if(menu.menuItem == 'Reset App State') { // po poprzednim kroku 'Logout'
+            cy.mojLoginSwagStore(loginy.username, loginy.password) //loguj
+            cy.czyAddToCartButtonReset('Remove', 6) //czy pamieta stan koszyka i buttonow po poprzednim kroku 'Logout'
+        }
+
+        if(menu.menuItem == 'Logout') {cy.visit('/inventory.html') } //tylko opja 'Logout' tego wymaga
+
+        cy.get('.shopping_cart_link').should('be.visible').click() //przejdz do koszyka
+        cy.url().should('contain', '/cart.html')
+        cy.get('#checkout').should('be.visible').click() //przejdz do checkout-step-one.html 
+        cy.url().should('contain','/checkout-step-one.html')
+
+        cy.get('#react-burger-menu-btn').should('be.visible').click() //burger menu button widoczny
+        cy.get('.bm-item-list').should('be.visible') //menu musi byc widoczne (lub .bm-menu-wrap, aria-hidden = 'true' or 'false')
+        cy.get('.bm-item-list').contains(menu.menuItem).should('have.text', menu.menuItem) //czy zgodne z opisem
+
+        if (menu.menuItem != 'About') {   //z wyjatkiem 'About' bo 'https://saucelabs.com/' sie dlugo laduje i wywala test
+
+            if (menu.menuItem == 'Reset App State') {  //sprawdzenie dzialania opcji 'Reset App state'
+
+                //czy pamieta stan koszyka w '/checkout-step-one.html' po ponownym zalogowaniu (poprzedni krok 'Logout')
+                cy.get('.shopping_cart_link').should('not.be.empty').children().should('have.text', 6) 
+
+                cy.get('.bm-item-list').contains('Reset App State').click() //resetuje Apke
+                //cy.checkPageReload('Reset App State') // tak zamiast powyzszej ale wiem, ze nie odswieza
+                //cy.get('#react-burger-menu-btn').should('be.visible').click() //burger menu button widoczny
+                cy.get('.bm-cross-button').should('be.visible').click()
+                cy.get('.bm-item-list').should('not.be.visible')  //sprawdzenie czy dziala button 'X' zamykajacy menu
+
+                cy.get('.shopping_cart_link').should('be.empty') //spawdza koszyk w '/checkout-step-one.html'
+                cy.get('#cancel').should("be.visible").click() //powrot do '/cart.html' 
+
+                cy.get('.shopping_cart_link').should('be.empty') //spawdza koszyk w '/cart.html'
+                cy.get('.cart_list').children().should('have.length', 2) //spawdza '.cart_list' czy elemety usuniete koszyka
+                cy.get('#continue-shopping').should('be.visible').click()  //powrot do inventory
+                cy.czyAddToCartButtonReset('Add to cart', 0) //czy buttony 'Add to cart' w zresetowane w '/inventory.html'
+
+            }
+            else {
+                cy.get('.bm-item-list').contains(menu.menuItem).click() //klika w aktualna opcje zeby sprawdzic przekierowanie 
+                cy.url().should('contain', menu.action)  //czy dziala przekierowanie ?
+                if (menu.menuItem == 'All Items') { 
+                    cy.dodajKazdyDoKoszyka() //w pierwszym kroku dodaj wszystkie produkty do koszyka 
+                }  
+            }
+        }
+        else { //jesli opcja: 'About'
+            cy.get('.shopping_cart_link').should('not.be.empty').children().should('have.text', 6) //spawdza koszyk w '/checkout-step-one.html'
+            cy.get('.bm-item-list').contains(menu.menuItem).should('have.attr', 'href') //sprawdza link dla opcji 'About'
+            cy.get('.bm-item-list').contains(menu.menuItem).invoke('attr', 'href').should('contain', 'https://saucelabs.com/')
+        }
+
+    })
+
 
 })
