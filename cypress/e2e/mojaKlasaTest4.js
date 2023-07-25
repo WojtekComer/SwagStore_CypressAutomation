@@ -27,8 +27,12 @@ export const mojaKlasaTest4 = {
                 ${this.czasTestu()}`;
                 break;
             case 'testyCartPojedynczo':
-                return `Test ${licznik+1} / ${tablica.length} - Add to / Remove from cart:
+                return `Test ${licznik+1} / ${tablica.length} - Add to / Remove from cart: 
                 ${zmienna.artykul}
+                ${this.czasTestu()}`;
+                break;
+            case 'checkoutFormTest':
+                return `Test ${licznik+1} / ${tablica.length} - 'CHECKOUT' with ${zmienna.opisTestu}
                 ${this.czasTestu()}`;
                 break;
 
