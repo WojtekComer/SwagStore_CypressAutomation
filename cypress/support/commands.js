@@ -24,162 +24,250 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-Cypress.Commands.add('mojLoginSwagStore', (user, pass) => {
-
-    cy.visit('/')
-    cy.url().should('include', 'SwagLabs')   //sprawdzenie url
-    cy.get('[data-test="username"]').type(user)
-    cy.get('[data-test="password"]').type(pass)
-    cy.get('[data-test="login-button"]').click()
+Cypress.Commands.add("myLoginSwagStore", (user, pass) => {
+    cy.visit("/");
+    cy.url().should("include", "SwagLabs"); //sprawdzenie url
+    cy.get('[data-test="username"]').type(user);
+    cy.get('[data-test="password"]').type(pass);
+    cy.get('[data-test="login-button"]').click();
     //cy.url().should('include', 'inventory.html')
+});
 
-})
+Cypress.Commands.add("checkProductsPricesSorting", (sortingOption) => {
+    cy.get(".inventory_list")
+        .should("be.visible")
+        .find(".inventory_item_price")
+        .map("innerText")
+        .mapInvoke("slice", 1)
+        .map(Number)
+        .should(sortingOption); //sprawdza czy ceny posortowane w zaleznosci od 'sortingOption'
+});
 
-Cypress.Commands.add('sprawdzSortowanieCenArtykulow', (opcjaSortowania) => {
+Cypress.Commands.add("checkProductsNamesSorting", (sortingOption) => {
+    cy.get(".inventory_list")
+        .should("be.visible")
+        .find(".inventory_item_name")
+        .map("innerText")
+        .should(sortingOption);
+    //sprawdza czy nazwy posortowane w zaleznosci od 'sortingOption'
+});
 
-    cy.get('.inventory_list').should('be.visible').find('.inventory_item_price').map('innerText')
-        .mapInvoke('slice', 1).map(Number).should(opcjaSortowania)  //sprawdza czy ceny posortowane w zaleznosci od 'opcjaSortowania'
+Cypress.Commands.add("createSession", (log, pass) => {
+    cy.session("Session - logging to Swag Store", () => {
+        //utrzymanie sesji
 
-})
+        cy.myLoginSwagStore(log, pass);
+        cy.url().should("contain", "/inventory.html");
+    });
+});
 
-Cypress.Commands.add('sprawdzSortowanieNazwArtykulow', (opcjaSortowania) => {
+Cypress.Commands.add("addOneProductToCart", (whichProduct, qtyInCart) => {
+    cy.url().should("contain", "/inventory.html"); //czy jest na '/inventory.html'
+    cy.get(".inventory_list")
+        .contains(whichProduct)
+        .parent()
+        .siblings()
+        .children()
+        .eq(1)
+        .should("contain", "Add to cart")
+        .click(); //dodaj do koszyka
+    cy.get(".shopping_cart_link")
+        .should("not.be.empty")
+        .children()
+        .should("have.text", qtyInCart); //sprawdz ilosc productow w koszyku
+});
 
-    cy.get('.inventory_list').should('be.visible').find('.inventory_item_name').map('innerText').should(opcjaSortowania)
-    //sprawdza czy nazwy posortowane w zaleznosci od 'opcjaSortowania'
+Cypress.Commands.add("addEachProductToCart", () => {
+    let counter = 0;
+    cy.url().should("contain", "/inventory.html"); //czy jest na '/inventory.html'
+    cy.get(".shopping_cart_link").should("be.empty"); //czy koszyk jest pusty na starcie
 
-})
+    cy.fixture("storeArticles").then((products) => {
+        products.forEach((product) => {
+            cy.get(".inventory_list")
+                .contains(product.article)
+                .parent()
+                .siblings()
+                .children()
+                .eq(1)
+                .should("contain", "Add to cart")
+                .click(); //dodaj do koszyka
+            counter = counter + 1;
+            cy.get(".shopping_cart_link")
+                .should("not.be.empty")
+                .children()
+                .should("have.text", counter); // ile w koszyku
+        });
+    });
+});
 
-Cypress.Commands.add('zrobSesje', (log, pass) => {
+Cypress.Commands.add("removeOneProductFromCart", (whichProduct, qtyInCart) => {
+    cy.get(".inventory_list")
+        .contains(whichProduct)
+        .parent()
+        .siblings()
+        .children()
+        .eq(1)
+        .should("contain", "Remove")
+        .click(); //usun z koszyka
+    if (qtyInCart == 0) {
+        //jesli koszyk ma byc pusty
+        cy.get(".shopping_cart_link").should("be.empty"); //sprawdz ilosc, czy koszyk jest pusty ?
+    } else {
+        cy.get(".shopping_cart_link")
+            .should("not.be.empty")
+            .children()
+            .should("have.text", qtyInCart);
+    } //ile w koszyku?
+});
 
-    cy.session('Sesja logowanie do Swag Store', () => {   //utrzymanie sesji
+Cypress.Commands.add(
+    "checkIfAddToCartButtonReset",
+    (buttonStatus, qtyInCart) => {
+        //sprawdza stan na '/inventory.html' po 'Reset App State'
 
-        cy.mojLoginSwagStore(log, pass)
-        cy.url().should('contain', '/inventory.html')
+        cy.url().should("contain", "/inventory.html"); //czy jest na '/inventory.html'
+        if (qtyInCart == 0) {
+            cy.get(".shopping_cart_link").should("be.empty");
+        } //czy koszyk jest pusty na starcie
+        else {
+            cy.get(".shopping_cart_link")
+                .should("not.be.empty")
+                .children()
+                .should("have.text", qtyInCart);
+        }
 
-    })
-})
+        cy.fixture("storeArticles").then((products) => {
+            //bierze dane z json'a z descriptionem artukulow/productow
 
-Cypress.Commands.add('dodajJedenDoKoszyka', (ktoryProdukt, sprawdzIlosc) => {
+            products.forEach((product) => {
+                //sprawdza kolejno products czy maja zresetowany button 'Add to cart'
 
-    cy.url().should('contain', '/inventory.html') //czy jest na '/inventory.html'
-    cy.get('.inventory_list').contains(ktoryProdukt).parent().siblings().children().eq(1)
-        .should('contain', 'Add to cart').click() //dodaj do koszyka
-    cy.get('.shopping_cart_link').should('not.be.empty').children().should('have.text', sprawdzIlosc) //sprawdz ilosc produktow w koszyku
+                cy.get(".inventory_list")
+                    .contains(product.article)
+                    .parent()
+                    .siblings()
+                    .children()
+                    .eq(1)
+                    .map("innerText")
+                    .then((buttonDesc) => {
+                        if (buttonDesc != buttonStatus.toUpperCase()) {
+                            //jesli button w innym stanie niz podany w 'buttonStatus'
 
-})
-
-Cypress.Commands.add('dodajKazdyDoKoszyka', () => {
-
-    let licznik = 0
-    cy.url().should('contain', '/inventory.html') //czy jest na '/inventory.html'
-    cy.get('.shopping_cart_link').should('be.empty') //czy koszyk jest pusty na starcie
-
-    cy.fixture('artukulyTest4').then((produkty) => {
-        produkty.forEach((produkt) => {
-            cy.get('.inventory_list').contains(produkt.artykul).parent().siblings().children().eq(1)
-                .should('contain', 'Add to cart').click() //dodaj do koszyka
-            licznik = licznik + 1
-            cy.get('.shopping_cart_link').should('not.be.empty').children().should('have.text', licznik) // ile w koszyku
-        })
-
-    })
-
-})
-
-Cypress.Commands.add('usunJedenZKoszyka', (skadUsunac, ktoryProdukt, sprawdzIlosc) => {
-
-    cy.get(skadUsunac).contains(ktoryProdukt).parent().siblings().children().eq(1)
-        .should('contain', 'Remove').click() //usun z koszyka
-    if (sprawdzIlosc == 0) {  //jesli koszyk ma byc pusty
-        cy.get('.shopping_cart_link').should('be.empty')  //sprawdz ilosc, czy koszyk jest pusty ?
-    }
-    else { cy.get('.shopping_cart_link').should('not.be.empty').children().should('have.text', sprawdzIlosc) } //ile w koszyku?
-
-
-})
-
-Cypress.Commands.add('czyAddToCartButtonReset', (stanButtona, stanKoszyka) => { //sprawdza stan na '/inventory.html' po 'Reset App State' 
-
-    cy.url().should('contain', '/inventory.html') //czy jest na '/inventory.html'
-    if (stanKoszyka == 0) { cy.get('.shopping_cart_link').should('be.empty') }  //czy koszyk jest pusty na starcie
-    else { cy.get('.shopping_cart_link').should('not.be.empty').children().should('have.text', stanKoszyka) }
-
-    cy.fixture('artukulyTest4').then((produkty) => {  //bierze dane z json'a z opisem artukulow/produktow 
-
-        produkty.forEach((produkt) => {  //sprawdza kolejno produkty czy maja zresetowany button 'Add to cart'
-
-            cy.get('.inventory_list').contains(produkt.artykul).parent().siblings().children().eq(1).map('innerText')
-                .then(opisButtona => {
-                    if (opisButtona != stanButtona.toUpperCase()) {  //jesli button w innym stanie niz podany w 'stanButtona'
-
-                        cy.log(`----- ERROR!!! ----  
+                            cy.log(`----- ERROR!!! ----  
                          Button \'Add to cart\' for below product: 
-                         '${produkt.artykul}' failed to reset`)
+                         '${product.article}' failed to reset`);
+                        }
+                    });
+                cy.get(".inventory_list")
+                    .contains(product.article)
+                    .parent()
+                    .siblings()
+                    .children()
+                    .eq(1)
+                    .should("contain", buttonStatus); //...buton przy kazdym produkcie ma byc zresetowany do stanu 'Add to cart'
+            });
+        });
+    }
+);
 
-                    }
-                })
-            cy.get('.inventory_list').contains(produkt.artykul).parent().siblings().children().eq(1)
-                .should('contain', stanButtona) //...buton przy kazdym produkcie ma byc zresetowany do stanu 'Add to cart'
+Cypress.Commands.add("checkPageReload", (menuOption) => {
+    cy.window().then((w) => (w.beforeReload = true));
+    cy.window().should("have.prop", "beforeReload", true); // initially the new property is there
+    cy.get(".bm-item-list").contains(menuOption).click(); //reload
+    cy.window().should("not.have.prop", "beforeReload"); // after reload the property should be gone
+});
 
-        })
+Cypress.Commands.add("checkInventoryProductDesc", (product) => {
+    //testowanie descriptionow i cen na invemtory
 
-    })
+    cy.get(".inventory_list")
+        .contains("div", product.article)
+        .should("contain", product.article);
+    cy.get(".inventory_list")
+        .contains("div", product.article)
+        .parent("a")
+        .siblings()
+        .should("contain", product.articleDescription);
+    cy.get(".inventory_list")
+        .contains(product.article)
+        .parent()
+        .siblings()
+        .children()
+        .eq(0)
+        .should("contain", product.price);
+});
 
-})
+Cypress.Commands.add("checkCartProductDesc", (product) => {
+    //testowanie descriptionow ilosci i cen w koszyku
 
-Cypress.Commands.add('checkPageReload', (opcjaMenu) => {
+    cy.get(".cart_list")
+        .contains("div", product.article)
+        .should("contain", product.article);
+    cy.get(".cart_list")
+        .contains("div", product.article)
+        .parent()
+        .parent()
+        .siblings()
+        .should("have.text", 1);
+    cy.get(".cart_list")
+        .contains("div", product.article)
+        .parent()
+        .siblings()
+        .eq(0)
+        .should("contain", product.articleDescription);
+    cy.get(".cart_list")
+        .contains("div", product.article)
+        .parent()
+        .siblings()
+        .eq(1)
+        .children()
+        .eq(0)
+        .should("contain", product.price);
+});
 
-    cy.window().then(w => w.beforeReload = true)
-    cy.window().should('have.prop', 'beforeReload', true)  // initially the new property is there
-    cy.get('.bm-item-list').contains(opcjaMenu).click() //reload
-    cy.window().should('not.have.prop', 'beforeReload') // after reload the property should be gone
+Cypress.Commands.add("checkLink", (whichMedia, link) => {
+    cy.get(".footer")
+        .find(whichMedia)
+        .should("be.visible")
+        .children()
+        .should("have.attr", "href");
+    cy.get(".footer")
+        .find(whichMedia)
+        .children()
+        .invoke("attr", "href")
+        .should("contain", link);
+});
 
-})
-
-Cypress.Commands.add('sprawdzOpisProduktuInventory', (produkt) => {  //testowanie opisow i cen na invemtory
-
-    cy.get('.inventory_list').contains('div', produkt.artykul).should('contain', produkt.artykul)
-    cy.get('.inventory_list').contains('div', produkt.artykul).parent('a').siblings().should('contain', produkt.opisArtykulu)
-    cy.get('.inventory_list').contains(produkt.artykul).parent().siblings().children().eq(0).should('contain', produkt.cena)
-})
-
-Cypress.Commands.add('sprawdzOpisProduktuCart', (produkt) => {   //testowanie opisow ilosci i cen w koszyku
-
-    cy.get('.cart_list').contains('div', produkt.artykul).should('contain', produkt.artykul)
-    cy.get('.cart_list').contains('div', produkt.artykul).parent().parent().siblings().should('have.text', 1)
-    cy.get('.cart_list').contains('div', produkt.artykul).parent().siblings().eq(0).should('contain', produkt.opisArtykulu)
-    cy.get('.cart_list').contains('div', produkt.artykul).parent().siblings().eq(1).children()
-        .eq(0).should('contain', produkt.cena)
-})
-
-Cypress.Commands.add('sprawdzLink', (jakieMedia, link) => {
-
-    cy.get('.footer').find(jakieMedia).should('be.visible').children().should('have.attr', 'href')
-    cy.get('.footer').find(jakieMedia).children().invoke('attr', 'href').should('contain', link)
-
-})
-
-Cypress.Commands.add('sprawdzFooter', () => {
-
-    cy.get('.footer').find('.footer_robot').should('be.visible')
-    cy.get('.footer').find('.footer_copy').should('contain', ' Sauce Labs. All Rights Reserved. Terms of Service | Privacy Policy')
+Cypress.Commands.add("checkFooter", () => {
+    cy.get(".footer").find(".footer_robot").should("be.visible");
+    cy.get(".footer")
+        .find(".footer_copy")
+        .should(
+            "contain",
+            " Sauce Labs. All Rights Reserved. Terms of Service | Privacy Policy"
+        );
     //sprawdz linki
-    cy.sprawdzLink('.social_twitter', 'https://twitter.com/saucelabs')
-    cy.sprawdzLink('.social_facebook', 'https://www.facebook.com/saucelabs')
-    cy.sprawdzLink('.social_linkedin', 'https://www.linkedin.com/company/sauce-labs/')
+    cy.checkLink(".social_twitter", "https://twitter.com/saucelabs");
+    cy.checkLink(".social_facebook", "https://www.facebook.com/saucelabs");
+    cy.checkLink(
+        ".social_linkedin",
+        "https://www.linkedin.com/company/sauce-labs/"
+    );
+});
 
-})
+Cypress.Commands.add("checkHeader", (title) => {
+    cy.get(".app_logo").should("be.visible");
+    cy.get(".header_secondary_container")
+        .find(".title")
+        .should("be.visible")
+        .should("have.text", title);
+});
 
-Cypress.Commands.add('sprawdzHeader', (tytul) => {
-
-    cy.get('.app_logo').should('be.visible')
-    cy.get('.header_secondary_container').find('.title').should('be.visible').should('have.text', tytul)
-
-})
-
-Cypress.Commands.add('sprawdzPlaceholder', (gdzie, pole, opis) => {
-
-    cy.get(gdzie).find(pole).should('have.attr', 'placeholder')
-    cy.get(gdzie).find(pole).invoke('attr', 'placeholder').should('contain', opis) //sprawdzenie placeholdera 'Username'
-
-})
+Cypress.Commands.add("checkPlaceholder", (where, field, description) => {
+    cy.get(where).find(field).should("have.attr", "placeholder");
+    cy.get(where)
+        .find(field)
+        .invoke("attr", "placeholder")
+        .should("contain", description); //sprawdzenie placeholdera 'Username'
+});
