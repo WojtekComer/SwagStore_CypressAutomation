@@ -1,6 +1,6 @@
 [
-    {   
-        "opisTestu": "missing first name",
+    {
+        "testDescription": "missing first name",
         "name": "{SelectAll}{backspace}",
         "surname": "Kowalski",
         "postalCode": "111-222",
@@ -8,7 +8,7 @@
         "result": "Error: First Name is required"
     },
     {
-        "opisTestu": "missing last name",
+        "testDescription": "missing last name",
         "name": "Jan",
         "surname": "{SelectAll}{backspace}",
         "postalCode": "111-222",
@@ -16,7 +16,7 @@
         "result": "Error: Last Name is required"
     },
     {
-        "opisTestu": "missing postal code",
+        "testDescription": "missing postal code",
         "name": "Jan",
         "surname": "Kowalski",
         "postalCode": "{SelectAll}{backspace}",
@@ -24,7 +24,7 @@
         "result": "Error: Postal Code is required"
     },
     {
-        "opisTestu": "correct data",
+        "testDescription": "correct data",
         "name": "Jan",
         "surname": "Kowalski",
         "postalCode": "111-222"
