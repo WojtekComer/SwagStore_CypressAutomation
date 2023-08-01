@@ -271,3 +271,11 @@ Cypress.Commands.add("checkPlaceholder", (where, field, description) => {
         .invoke("attr", "placeholder")
         .should("contain", description); //sprawdzenie placeholdera 'Username'
 });
+
+Cypress.Commands.add("fillInCheckoutForm", (firstName, lastName, postCode) => {
+    cy.url().should("contain", "/checkout-step-one.html");
+    cy.get(".checkout_info").find("#first-name").type(firstName);
+    cy.get(".checkout_info").find("#last-name").type(lastName);
+    cy.get(".checkout_info").find("#postal-code").type(postCode);
+    cy.get("#continue").should("be.visible").click();
+});
