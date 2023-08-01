@@ -10,7 +10,7 @@ describe(
     "\n5.1 'CHECKOUT: OVERVIEW' PAGE - BURGER MENU TEST\n",
     { testIsolation: false },
     () => {
-        it("Login - Reset App State - Logout", () => {
+        before("Login - Reset App State - Logout", () => {
             cy.myLoginSwagStore(loginy.username, loginy.password); //loguj
             cy.get("#react-burger-menu-btn").should("be.visible").click();
             cy.get(".bm-item-list").contains("Reset App State").click();
