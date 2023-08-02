@@ -11,10 +11,7 @@ describe(
     { testIsolation: false },
     () => {
         before("Login - Reset App State - Logout", () => {
-            cy.myLoginSwagStore(loginy.username, loginy.password); //loguj
-            cy.get("#react-burger-menu-btn").should("be.visible").click();
-            cy.get(".bm-item-list").contains("Reset App State").click();
-            cy.get(".bm-item-list").contains("Logout").click();
+            cy.resetAppState(loginy.username, loginy.password);
         });
 
         it.each(burgerMenuItems)(
@@ -105,18 +102,7 @@ describe(
                         }
                     }
                 } else {
-                    //jesli opcja: 'About'
-                    cy.get(".shopping_cart_link")
-                        .should("not.be.empty")
-                        .children()
-                        .should("have.text", 6); //spawdza koszyk w '/checkout-step-one.html'
-                    cy.get(".bm-item-list")
-                        .contains(menu.menuItem)
-                        .should("have.attr", "href"); //sprawdza link dla opcji 'About'
-                    cy.get(".bm-item-list")
-                        .contains(menu.menuItem)
-                        .invoke("attr", "href")
-                        .should("contain", "https://saucelabs.com/");
+                    cy.ifMenuOptionAbout("checkoutOverview");
                 }
             }
         );
