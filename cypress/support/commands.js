@@ -279,3 +279,33 @@ Cypress.Commands.add("fillInCheckoutForm", (firstName, lastName, postCode) => {
     cy.get(".checkout_info").find("#postal-code").type(postCode);
     cy.get("#continue").should("be.visible").click();
 });
+
+Cypress.Commands.add("resetAppState", (log, pass) => {
+    cy.myLoginSwagStore(log, pass);
+    cy.get("#react-burger-menu-btn").should("be.visible").click();
+    cy.get(".bm-item-list").contains("Reset App State").click();
+    cy.get(".shopping_cart_link").should("be.empty");
+    cy.get(".bm-item-list").contains("Logout").click();
+});
+
+Cypress.Commands.add("ifMenuOptionAbout", (whichPage) => {
+    if (whichPage != "Complete") {
+        cy.get(".shopping_cart_link") //!!!strona Complete - bez sprawdzania koszyka
+            .should("not.be.empty")
+            .children()
+            .should("have.text", 6); //spawdza cyfre w ikonie koszyka
+    }
+    if (whichPage == "Cart" || whichPage == "checkoutOverview") {
+        //!!!strony Cart i checkoutOverview - sprawdza ".cart_list" czy sie dodalo w poprzednim kroku
+        cy.get(".cart_list").children().should("have.length", 8);
+    }
+    cy.get(".bm-item-list").contains("About").should("have.attr", "href"); //sprawdza link dla opcji 'About'
+    cy.get(".bm-item-list")
+        .contains("About")
+        .invoke("attr", "href")
+        .should("contain", "https://saucelabs.com/");
+
+    if (whichPage == "Inventory") {
+        cy.get(".bm-cross-button").should("be.visible").click(); //!!!strona Inventory- zamknij burger menu
+    }
+});
