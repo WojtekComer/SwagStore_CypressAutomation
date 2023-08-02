@@ -9,6 +9,10 @@ describe(
     "\n3.1 'YOUR CART' PAGE - BURGER MENU TEST\n",
     { testIsolation: false },
     () => {
+        before("Login - Reset App State - Logout", () => {
+            cy.resetAppState(loginy.username, loginy.password);
+        });
+
         it.each(burgerMenuItems)(
             (z, l, t) =>
                 myClassTestDescAndDate.testDescription(
@@ -89,18 +93,7 @@ describe(
                     }
                 } else {
                     //jesli opcja: 'About'
-                    cy.get(".shopping_cart_link")
-                        .should("not.be.empty")
-                        .children()
-                        .should("have.text", 6); //spawdza stan koszyka na '/cart.html'
-                    cy.get(".cart_list").children().should("have.length", 8);
-                    cy.get(".bm-item-list")
-                        .contains(menu.menuItem)
-                        .should("have.attr", "href"); //sprawdza link dla opcji 'About'
-                    cy.get(".bm-item-list")
-                        .contains(menu.menuItem)
-                        .invoke("attr", "href")
-                        .should("contain", "https://saucelabs.com/");
+                    cy.ifMenuOptionAbout("Cart");
                 }
             }
         );
