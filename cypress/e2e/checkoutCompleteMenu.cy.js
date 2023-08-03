@@ -68,8 +68,11 @@ describe(
                         //cy.reload(); //wymusza odswiezenie strony
                         //Po odkomentowaniu powyzszej instrukcji przechodzi test
                     } else {
-                        cy.get(".bm-item-list").contains(menu.menuItem).click(); //klika w aktualna opcje zeby sprawdzic przekierowanie
-                        cy.url().should("contain", menu.action); //czy dziala przekierowanie ?
+                        cy.checkMenuOptionActionResult(
+                            "Complete",
+                            menu.menuItem,
+                            menu.action
+                        );
                     }
                 } else {
                     cy.ifMenuOptionAbout("Complete");

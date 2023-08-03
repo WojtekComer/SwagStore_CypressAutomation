@@ -82,11 +82,11 @@ describe(
                             .click(); //powrot do inventory
                         cy.checkIfAddToCartButtonReset("Add to cart", 0);
                     } else {
-                        cy.get(".bm-item-list").contains(menu.menuItem).click(); //klika w aktualna opcje zeby sprawdzic przekierowanie
-                        cy.url().should("contain", menu.action); //czy dziala przekierowanie ?
-                        if (menu.menuItem == "All Items") {
-                            cy.addEachProductToCart(); //w pierwszym kroku dodaj wszystkie products do koszyka
-                        }
+                        cy.checkMenuOptionActionResult(
+                            "Cart",
+                            menu.menuItem,
+                            menu.action
+                        );
                     }
                 } else {
                     //jesli opcja: 'About'

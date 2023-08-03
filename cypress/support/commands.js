@@ -315,3 +315,23 @@ Cypress.Commands.add("checkCurrentMenuOption", (option) => {
     cy.get(".bm-item-list").should("be.visible"); //menu musi byc widoczne
     cy.get(".bm-item-list").contains(option).should("have.text", option); //czy zgodne z opisem
 });
+
+Cypress.Commands.add(
+    "checkMenuOptionActionResult",
+    (whichPage, option, result) => {
+        cy.get(".bm-item-list").contains(option).click(); //klika w aktualna opcje zeby sprawdzic przekierowanie
+        cy.url().should("contain", result); //czy dziala przekierowanie ?
+        if (whichPage != "Complete") {
+            //dla wszystkich stron oprocz 'checkoutComplete'
+            if (option == "All Items") {
+                //tylko dla opcji 'All Items'
+                cy.addEachProductToCart(); //w pierwszym kroku dodaj wszystkie produkty do koszyka
+                if (whichPage == "Inventory") {
+                    //tylko dla strony 'Inventory'
+                    cy.get(".bm-cross-button").should("be.visible").click(); //zamknij burger menu
+                    cy.get(".bm-item-list").should("not.be.visible");
+                }
+            }
+        }
+    }
+);

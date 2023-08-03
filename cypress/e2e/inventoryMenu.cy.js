@@ -59,17 +59,13 @@ describe(
                         //cy.reload(); //wymusza odswiezenie strony
                         //Po odkomentowaniu powyzszej instrukcji przechodzi test
 
-                        cy.checkIfAddToCartButtonReset("Add to cart", 0); //czy buttony 'Add to cart' w zresetowane w '/inventory.html'
+                        cy.checkIfAddToCartButtonReset("Add to cart", 0); //czy buttony 'Add to cart' zresetowane w '/inventory.html'
                     } else {
-                        cy.get(".bm-item-list").contains(menu.menuItem).click(); //klika w aktualna opcje zeby sprawdzic przekierowanie
-                        cy.url().should("contain", menu.action); //czy dziala przekierowanie ?
-                        if (menu.menuItem == "All Items") {
-                            cy.addEachProductToCart(); //w pierwszym kroku dodaj wszystkie produkty do koszyka
-                            cy.get(".bm-cross-button")
-                                .should("be.visible")
-                                .click(); //zamknij burger menu
-                            cy.get(".bm-item-list").should("not.be.visible");
-                        }
+                        cy.checkMenuOptionActionResult(
+                            "Inventory",
+                            menu.menuItem,
+                            menu.action
+                        );
                     }
                 } else {
                     cy.ifMenuOptionAbout("Inventory"); //jesli opcja: 'About'
