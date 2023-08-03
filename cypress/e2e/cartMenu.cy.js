@@ -36,11 +36,8 @@ describe(
 
                 cy.get(".shopping_cart_link").should("be.visible").click(); //przejdz do koszyka
                 cy.url().should("contain", "/cart.html");
-                cy.get("#react-burger-menu-btn").should("be.visible").click(); //burger menu button widoczny
-                cy.get(".bm-item-list").should("be.visible"); //menu musi byc widoczne (lub .bm-menu-wrap, aria-hidden = 'true' or 'false')
-                cy.get(".bm-item-list")
-                    .contains(menu.menuItem)
-                    .should("have.text", menu.menuItem); //czy zgodne z descriptionem
+
+                cy.checkCurrentMenuOption(menu.menuItem); //czy aktualna opcja w petli zgodna z opisem
 
                 if (menu.menuItem != "About") {
                     //z wyjatkiem 'About' bo 'https://saucelabs.com/' sie dlugo laduje i wywala test

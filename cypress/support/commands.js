@@ -309,3 +309,9 @@ Cypress.Commands.add("ifMenuOptionAbout", (whichPage) => {
         cy.get(".bm-cross-button").should("be.visible").click(); //!!!strona Inventory- zamknij burger menu
     }
 });
+
+Cypress.Commands.add("checkCurrentMenuOption", (option) => {
+    cy.get("#react-burger-menu-btn").should("be.visible").click(); //burger menu button widoczny
+    cy.get(".bm-item-list").should("be.visible"); //menu musi byc widoczne
+    cy.get(".bm-item-list").contains(option).should("have.text", option); //czy zgodne z opisem
+});
