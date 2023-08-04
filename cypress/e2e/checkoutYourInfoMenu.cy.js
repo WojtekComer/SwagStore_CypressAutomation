@@ -40,21 +40,15 @@ describe(
                     //z wyjatkiem 'About' bo 'https://saucelabs.com/' sie dlugo laduje i wywala test
 
                     if (menu.menuItem == "Reset App State") {
-                        //sprawdzenie dzialania opcji 'Reset App state'
-
                         //czy pamieta stan koszyka w '/checkout-step-one.html' po ponownym zalogowaniu (poprzedni krok 'Logout')
-                        cy.get(".shopping_cart_link")
-                            .should("not.be.empty")
-                            .children()
-                            .should("have.text", 6);
+                        cy.checkAfterMenuLogout("checkoutYourInfo");
 
                         cy.get(".bm-item-list")
                             .contains("Reset App State")
                             .click(); //resetuje Apke
                         //cy.checkPageReload('Reset App State') // tak zamiast powyzszej ale wiem, ze nie odswieza
-                        cy.get(".bm-cross-button").should("be.visible").click();
-                        cy.get(".bm-item-list").should("not.be.visible"); //sprawdzenie czy dziala button 'X' zamykajacy menu
 
+                        cy.closeMenu();
                         cy.get(".shopping_cart_link").should("be.empty"); //spawdza koszyk w '/checkout-step-one.html'
                         cy.get("#cancel").should("be.visible").click(); //powrot do '/cart.html'
 
@@ -62,6 +56,7 @@ describe(
                         cy.get(".cart_list")
                             .children()
                             .should("have.length", 2); //spawdza '.cart_list' czy elemety usuniete koszyka
+
                         cy.get("#continue-shopping")
                             .should("be.visible")
                             .click(); //powrot do inventory

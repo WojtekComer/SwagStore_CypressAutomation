@@ -48,27 +48,14 @@ describe(
 
                     if (menu.menuItem == "Reset App State") {
                         //czy pamieta stan koszyka w '/checkout-step-two.html' po ponownym zalogowaniu (poprzedni krok 'Logout')
-                        cy.get(".shopping_cart_link")
-                            .should("not.be.empty")
-                            .children()
-                            .should("have.text", 6); //cyfra z iloscia w ikonie koszyka
-                        cy.get(".cart_list")
-                            .children()
-                            .should("have.length", 8); //ilosc w koszyku
-                        cy.fixture("storeArticles").then((products) => {
-                            //opisy produktow
-                            products.forEach((product) => {
-                                cy.checkCartProductDesc(product);
-                            });
-                        });
+                        cy.checkAfterMenuLogout("checkoutOverview");
 
                         cy.get(".bm-item-list")
                             .contains("Reset App State")
                             .click(); //resetuje Apke
                         //cy.checkPageReload('Reset App State') // tak zamiast powyzszej ale wiem, ze nie odswieza
-                        cy.get(".bm-cross-button").should("be.visible").click();
-                        cy.get(".bm-item-list").should("not.be.visible"); //sprawdzenie czy dziala button 'X' zamykajacy menu
 
+                        cy.closeMenu();
                         cy.get(".shopping_cart_link").should("be.empty"); //spawdza koszyk w '/checkout-step-two.html'
 
                         //DEFEKT - nie odswieza strony po 'Reset App State'.

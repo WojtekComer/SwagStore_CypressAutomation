@@ -354,3 +354,25 @@ Cypress.Commands.add("doIfMenuOptionIs", (whichPage, option, user, pass) => {
         cy.visit("/inventory.html");
     } //tylko opja 'Logout' tego wymaga
 });
+
+Cypress.Commands.add("checkAfterMenuLogout", (whichPage) => {
+    cy.get(".shopping_cart_link")
+        .should("not.be.empty")
+        .children()
+        .should("have.text", 6);
+    if (whichPage == "Cart" || whichPage == "checkoutOverview") {
+        cy.get(".cart_list").children().should("have.length", 8);
+        cy.fixture("storeArticles").then((products) => {
+            //opisy produktow
+            products.forEach((product) => {
+                cy.checkCartProductDesc(product);
+            });
+        });
+    }
+});
+
+Cypress.Commands.add("closeMenu", () => {
+    //sprawdzenie czy dziala button 'X' zamykajacy menu
+    cy.get(".bm-cross-button").should("be.visible").click();
+    cy.get(".bm-item-list").should("not.be.visible");
+});

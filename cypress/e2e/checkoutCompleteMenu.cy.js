@@ -54,8 +54,8 @@ describe(
                             .contains("Reset App State")
                             .click(); //resetuje Apke
                         //cy.checkPageReload('Reset App State') // tak zamiast powyzszej ale wiem, ze nie odswieza
-                        cy.get(".bm-cross-button").should("be.visible").click();
-                        cy.get(".bm-item-list").should("not.be.visible"); //sprawdzenie czy dziala button 'X' zamykajacy menu
+
+                        cy.closeMenu();
 
                         //DEFEKT - nie odswieza strony po 'Reset App State'.
                         //cy.reload(); //wymusza odswiezenie strony
