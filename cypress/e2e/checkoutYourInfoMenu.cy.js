@@ -22,18 +22,12 @@ describe(
                     "testingBurgerMenu"
                 ),
             (menu) => {
-                if (menu.menuItem == "All Items") {
-                    cy.myLoginSwagStore(loginy.username, loginy.password); //loguj
-                }
-                if (menu.menuItem == "Reset App State") {
-                    // po poprzednim kroku 'Logout'
-                    cy.myLoginSwagStore(loginy.username, loginy.password); //loguj
-                    cy.checkIfAddToCartButtonReset("Remove", 6); //czy pamieta stan koszyka i buttonow po poprzednim kroku 'Logout'
-                }
-
-                if (menu.menuItem == "Logout") {
-                    cy.visit("/inventory.html");
-                } //tylko opja 'Logout' tego wymaga
+                cy.doIfMenuOptionIs(
+                    "checkoutYourInfo",
+                    menu.menuItem,
+                    loginy.username,
+                    loginy.password
+                );
 
                 cy.get(".shopping_cart_link").should("be.visible").click(); //przejdz do koszyka
                 cy.url().should("contain", "/cart.html");
@@ -58,7 +52,6 @@ describe(
                             .contains("Reset App State")
                             .click(); //resetuje Apke
                         //cy.checkPageReload('Reset App State') // tak zamiast powyzszej ale wiem, ze nie odswieza
-                        //cy.get('#react-burger-menu-btn').should('be.visible').click() //burger menu button widoczny
                         cy.get(".bm-cross-button").should("be.visible").click();
                         cy.get(".bm-item-list").should("not.be.visible"); //sprawdzenie czy dziala button 'X' zamykajacy menu
 

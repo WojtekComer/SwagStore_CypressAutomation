@@ -335,3 +335,22 @@ Cypress.Commands.add(
         }
     }
 );
+
+Cypress.Commands.add("doIfMenuOptionIs", (whichPage, option, user, pass) => {
+    //inventory //cart //checkout your info // overview //
+    if (option == "All Items") {
+        cy.myLoginSwagStore(user, pass); //loguj
+    }
+    if (option == "Reset App State") {
+        // po poprzednim kroku 'Logout'
+        cy.myLoginSwagStore(user, pass); //loguj
+        if (whichPage == "Complete") {
+            cy.checkIfAddToCartButtonReset("Add to cart", 0); //czy pamieta stan koszyka i buttonow po 'Logout'
+        } else {
+            cy.checkIfAddToCartButtonReset("Remove", 6); //czy pamieta stan koszyka i buttonow po 'Logout'
+        }
+    }
+    if (option == "Logout") {
+        cy.visit("/inventory.html");
+    } //tylko opja 'Logout' tego wymaga
+});

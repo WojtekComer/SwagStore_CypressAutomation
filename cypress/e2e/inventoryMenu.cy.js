@@ -22,19 +22,14 @@ describe(
                     "testingBurgerMenu"
                 ),
             (menu) => {
-                if (menu.menuItem == "All Items") {
-                    cy.myLoginSwagStore(loginy.username, loginy.password); //loguj
-                }
-                if (menu.menuItem == "Reset App State") {
-                    // po poprzednim kroku 'Logout'
-                    cy.myLoginSwagStore(loginy.username, loginy.password); //loguj
-                    cy.checkIfAddToCartButtonReset("Remove", 6); //czy pamieta stan koszyka i buttonow po poprzednim kroku 'Logout'
-                }
-                if (menu.menuItem == "Logout") {
-                    cy.visit("/inventory.html");
-                } //tylko opja 'Logout' tego wymaga
+                cy.doIfMenuOptionIs(
+                    "Inventory",
+                    menu.menuItem,
+                    loginy.username,
+                    loginy.password
+                );
 
-                cy.checkCurrentMenuOption(menu.menuItem); //czy aktualna opcja w petl izgodna z opisem
+                cy.checkCurrentMenuOption(menu.menuItem); //czy aktualna opcja w petli zgodna z opisem
 
                 if (menu.menuItem != "About") {
                     //z wyjatkiem 'About' bo 'https://saucelabs.com/' sie dlugo laduje i wywala test
