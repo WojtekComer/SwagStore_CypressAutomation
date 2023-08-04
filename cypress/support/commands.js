@@ -376,3 +376,17 @@ Cypress.Commands.add("closeMenu", () => {
     cy.get(".bm-cross-button").should("be.visible").click();
     cy.get(".bm-item-list").should("not.be.visible");
 });
+
+Cypress.Commands.add("checkAfterResetApp", (whichPage) => {
+    if (whichPage == "checkoutYourInfo") {
+        // yourInfo
+        cy.get(".shopping_cart_link").should("be.empty");
+        cy.get("#cancel").should("be.visible").click(); //powrot do '/cart.html' -> tylk
+    }
+
+    cy.get(".shopping_cart_link").should("be.empty"); //spawdza koszyk w '/cart.html'
+    cy.get(".cart_list").children().should("have.length", 2); //spawdza '.cart_list' czy usuniete //cart
+
+    cy.visit("/inventory.html");
+    cy.checkIfAddToCartButtonReset("Add to cart", 0); //inventory //wszytskie strony
+});

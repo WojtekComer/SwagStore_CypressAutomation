@@ -35,7 +35,7 @@ describe(
                     //z wyjatkiem 'About' bo 'https://saucelabs.com/' sie dlugo laduje i wywala test
 
                     if (menu.menuItem == "Reset App State") {
-                        //czy pamieta stan koszyka w '/checkout-step-two.html' po ponownym zalogowaniu (poprzedni krok 'Logout')
+                        //czy pamieta stan koszyka w '/inventory.html' po ponownym zalogowaniu (poprzedni krok 'Logout')
                         cy.checkAfterMenuLogout("Inventory");
 
                         cy.get(".bm-item-list")

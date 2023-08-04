@@ -54,12 +54,9 @@ describe(
                             .contains("Reset App State")
                             .click(); //resetuje Apke
                         //cy.checkPageReload('Reset App State') // tak zamiast powyzszej ale wiem, ze nie odswieza
+                        //test mialby na celu sprawdzenie czy strona sie odswiezyla po kliknieciu 'Reset App State'
 
-                        cy.closeMenu();
-
-                        //DEFEKT - nie odswieza strony po 'Reset App State'.
-                        //cy.reload(); //wymusza odswiezenie strony
-                        //Po odkomentowaniu powyzszej instrukcji przechodzi test
+                        cy.closeMenu(); //ta funkcja nie mialaby sensu gdyby dzialalo odswiezanie
                     } else {
                         cy.checkMenuOptionActionResult(
                             "Complete",

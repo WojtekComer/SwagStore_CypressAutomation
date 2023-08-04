@@ -45,22 +45,13 @@ describe(
                             .contains("Reset App State")
                             .click(); //resetuje Apke
                         //cy.checkPageReload('Reset App State') // tak zamiast powyzszej ale wiem ze nie odswieza
-
                         cy.closeMenu();
-                        cy.get(".shopping_cart_link").should("be.empty");
 
                         //DEFEKT - nie odswieza strony po 'Reset App State'.
                         //cy.reload(); //wymusza odswiezenie strony
                         //Po odkomentowaniu powyzszej instrukcji przechodzi test
 
-                        cy.get(".cart_list")
-                            .children()
-                            .should("have.length", 2); //czy usunal products z koszyka
-
-                        cy.get("#continue-shopping")
-                            .should("be.visible")
-                            .click(); //powrot do inventory
-                        cy.checkIfAddToCartButtonReset("Add to cart", 0);
+                        cy.checkAfterResetApp("Cart");
                     } else {
                         cy.checkMenuOptionActionResult(
                             "Cart",

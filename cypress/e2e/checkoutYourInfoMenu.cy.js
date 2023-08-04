@@ -49,18 +49,7 @@ describe(
                         //cy.checkPageReload('Reset App State') // tak zamiast powyzszej ale wiem, ze nie odswieza
 
                         cy.closeMenu();
-                        cy.get(".shopping_cart_link").should("be.empty"); //spawdza koszyk w '/checkout-step-one.html'
-                        cy.get("#cancel").should("be.visible").click(); //powrot do '/cart.html'
-
-                        cy.get(".shopping_cart_link").should("be.empty"); //spawdza koszyk w '/cart.html'
-                        cy.get(".cart_list")
-                            .children()
-                            .should("have.length", 2); //spawdza '.cart_list' czy elemety usuniete koszyka
-
-                        cy.get("#continue-shopping")
-                            .should("be.visible")
-                            .click(); //powrot do inventory
-                        cy.checkIfAddToCartButtonReset("Add to cart", 0); //czy buttony 'Add to cart' w zresetowane w '/inventory.html'
+                        cy.checkAfterResetApp("checkoutYourInfo");
                     } else {
                         cy.checkMenuOptionActionResult(
                             "checkoutYourInfo",
