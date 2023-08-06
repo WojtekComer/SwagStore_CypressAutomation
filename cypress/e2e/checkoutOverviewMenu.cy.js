@@ -24,18 +24,12 @@ describe(
           loginy.username,
           loginy.password
         )
-
-        cy.get('.shopping_cart_link').should('be.visible').click() //przejdz do koszyka
-        cy.url().should('contain', '/cart.html')
-        cy.get('#checkout').should('be.visible').click() //przejdz do checkout-step-one.html
-        cy.fillInCheckoutForm(
-          //zrob checkout i przejdz do checkout:Overview
+        cy.moveTo(
+          'checkoutOverview',
           checkoutDetails.firstName,
           checkoutDetails.lastName,
           checkoutDetails.postCode
         )
-        cy.url().should('contain', '/checkout-step-two.html')
-
         cy.checkCurrentMenuOption(menu.menuItem) //czy aktualna opcja w petli zgodna z opisem
 
         if (menu.menuItem != 'About') {
@@ -50,8 +44,8 @@ describe(
 
             cy.closeMenu()
 
-            // //DEFEKT - nie odswieza strony po 'Reset App State'.
-            //cy.reload(); //wymusza odswiezenie strony
+            //DEFEKT - nie odswieza strony po 'Reset App State'.
+            //cy.reload() //wymusza odswiezenie strony
             //Po odkomentowaniu powyzszej instrukcji przechodzi test
 
             // cy.get("#cancel").should("be.visible").click(); //powrot do inventory

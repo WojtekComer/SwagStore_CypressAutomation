@@ -24,20 +24,12 @@ describe(
           loginy.username,
           loginy.password
         )
-
-        cy.get('.shopping_cart_link').should('be.visible').click() //przejdz do koszyka
-        cy.url().should('contain', '/cart.html')
-        cy.get('#checkout').should('be.visible').click() //przejdz do checkout-step-one.html
-        cy.fillInCheckoutForm(
-          //zrob checkout i przejdz do checkout:Overview
+        cy.moveTo(
+          'Complete',
           checkoutDetails.firstName,
           checkoutDetails.lastName,
           checkoutDetails.postCode
         )
-        cy.url().should('contain', '/checkout-step-two.html') //zrobic tu funcjke checkCurrentMenuOption(option)
-        cy.get('#finish').should('be.visible').click()
-        cy.url().should('contain', '/checkout-complete.html') //przejdz do 'checkout: Complete!'
-
         cy.checkCurrentMenuOption(menu.menuItem) //czy aktualna opcja w petli zgodna z opisem
 
         if (menu.menuItem != 'About') {

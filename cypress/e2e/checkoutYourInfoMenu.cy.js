@@ -23,12 +23,7 @@ describe(
           loginy.username,
           loginy.password
         )
-
-        cy.get('.shopping_cart_link').should('be.visible').click() //przejdz do koszyka
-        cy.url().should('contain', '/cart.html')
-        cy.get('#checkout').should('be.visible').click() //przejdz do checkout-step-one.html
-        cy.url().should('contain', '/checkout-step-one.html')
-
+        cy.moveTo('checkoutYourInfo', 'noNeed', 'noNeed', 'noNeed')
         cy.checkCurrentMenuOption(menu.menuItem) //czy aktualna opcja w petli zgodna z opisem
 
         if (menu.menuItem != 'About') {

@@ -390,3 +390,19 @@ Cypress.Commands.add('checkAfterResetApp', (whichPage) => {
   cy.visit('/inventory.html')
   cy.checkIfAddToCartButtonReset('Add to cart', 0) //inventory //wszytskie strony
 })
+
+Cypress.Commands.add('moveTo', (whichPage, firstName, surName, postCode) => {
+  cy.get('.shopping_cart_link').should('be.visible').click() //przejdz do koszyka
+  cy.url().should('contain', '/cart.html')
+  cy.get('#checkout').should('be.visible').click() //przejdz do checkout-step-one.html
+  cy.url().should('contain', '/checkout-step-one.html')
+
+  if (whichPage != 'checkoutYourInfo') {
+    cy.fillInCheckoutForm(firstName, surName, postCode) //zrob checkout i przejdz do checkout:Overview
+    cy.url().should('contain', '/checkout-step-two.html')
+    if (whichPage == 'Complete') {
+      cy.get('#finish').should('be.visible').click() //przejdz do 'checkout: Complete!'
+      cy.url().should('contain', '/checkout-complete.html')
+    }
+  }
+})
