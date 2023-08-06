@@ -32,6 +32,7 @@ describe(
           if (menu.menuItem == 'Reset App State') {
             //czy pamieta stan koszyka w '/inventory.html' po ponownym zalogowaniu (poprzedni krok 'Logout')
             cy.checkAfterMenuLogout('Inventory')
+            cy.get('.select_container').children().eq(1).select('za') //posortuj malejaco
 
             cy.get('.bm-item-list').contains('Reset App State').click() //resetuje Apke
             //cy.checkPageReload('Reset App State') // tak zamiast powyzszej ale wiem, ze nie odswieza
@@ -40,9 +41,10 @@ describe(
             cy.get('.shopping_cart_link').should('be.empty') //spawdza koszyk w '/checkout-step-two.html'
 
             //DEFEKT - nie odswieza strony po 'Reset App State'.
-            //cy.reload(); //wymusza odswiezenie strony
+            //cy.reload() //wymusza odswiezenie strony
             //Po odkomentowaniu powyzszej instrukcji przechodzi test
 
+            cy.checkProductsNamesSorting('be.ascending') //po 'Reset App State' powinno byc domyslnie malejaco posortowane
             cy.checkIfAddToCartButtonReset('Add to cart', 0) //czy buttony 'Add to cart' zresetowane w '/inventory.html'
           } else {
             cy.checkMenuOptionActionResult(
