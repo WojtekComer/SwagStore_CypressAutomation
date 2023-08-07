@@ -10,18 +10,12 @@ describe("\n6. 'CHECKOUT: COMPLETE' PAGE TEST\n", () => {
     cy.myLoginSwagStore(loginy.username, loginy.password) //loguj
     cy.visit('/inventory.html')
     cy.addEachProductToCart() //dodaj wszystkie
-    cy.get('.shopping_cart_link').should('be.visible').click() //przejdz do koszyka
-    cy.url().should('contain', '/cart.html')
-    cy.get('#checkout').should('be.visible').click() //przejdz do checkout-step-one.html
-    cy.fillInCheckoutForm(
-      //zrob checkout i przejdz do checkout:Overview
+    cy.moveTo(
+      'Complete',
       checkoutDetails.firstName,
       checkoutDetails.lastName,
       checkoutDetails.postCode
     )
-    cy.get('#finish').should('be.visible').click()
-    cy.url().should('contain', '/checkout-complete.html') //przejdz do 'checkout: Complete!'
-
     cy.get('.shopping_cart_link').should('be.visible') //czy koszyk widoczny i pusty
     cy.get('.shopping_cart_link').should('be.empty').click() //przejdz do koszyka w '/cart.html'
     cy.url().should('contain', '/cart.html')
